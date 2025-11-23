@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M.E.G. Bot 控制面板</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 M.E.G. Bot 控制面板</h1>
+            <p>管理你的 Discord Bot 設定</p>
+        </header>
+
+        <div class="status-panel">
+            <div class="status-item">
+                <span class="status-label">Bot 狀態:</span>
+                <span class="status-value" id="botStatus">檢查中...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">上線時間:</span>
+                <span class="status-value" id="uptime">--</span>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab('ep-settings')">EP 系統</button>
+            <button class="tab-button" onclick="openTab('moderation')">管理功能</button>
+            <button class="tab-button" onclick="openTab('automation')">自動化</button>
+            <button class="tab-button" onclick="openTab('logging')">日誌設定</button>
+        </div>
+
+        <!-- EP 系統設定 -->
+        <div id="ep-settings" class="tab-content active">
+            <h2>💠 EP 系統設定</h2>
+            
+            <div class="setting-group">
+                <label>EP 增加指令權限</label>
+                <select id="epAddPermission">
+                    <option value="admin">僅管理員</option>
+                    <option value="mod">管理員+版主</option>
+                    <option value="all">所有使用者</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label>每日簽到獎勵 EP</label>
+                <input type="number" id="dailyReward" value="3" min="1" max="100">
+            </div>
+
+            <div class="setting-group">
+                <label>EP 等級階段</label>
+                <div class="level-settings" id="levelSettings">
+                    <!-- 等級設定會由 JavaScript 動態生成 -->
+                </div>
+                <button class="btn-secondary" onclick="addLevel()">➕ 新增等級</button>
+            </div>
+        </div>
+
+        <!-- 管理功能設定 -->
+        <div id="moderation" class="tab-content">
+            <h2>🛡️ 管理功能設定</h2>
+            
+            <div class="setting-group">
+                <label>防刷頻設定</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="antiSpamEnabled" checked>
+                    <label for="antiSpamEnabled">啟用防刷頻</label>
+                </div>
+                <div class="sub-settings">
+                    <label>訊息限制 (每5秒)</label>
+                    <input type="number" id="spamLimit" value="5" min="1" max="20">
+                    
+                    <label>警告次數限制</label>
+                    <input type="number" id="warningLimit" value="3" min="1" max="10">
+                    
+                    <label>禁言時間 (分鐘)</label>
+                    <input type="number" id="muteDuration" value="10" min="1" max="1440">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>自動審核系統</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="autoModEnabled">
+                    <label for="autoModEnabled">啟用自動審核</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 自動化設定 -->
+        <div id="automation" class="tab-content">
+            <h2>⚡ 自動化設定</h2>
+            
+            <div class="setting-group">
+                <label>歡迎訊息</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="welcomeEnabled" checked>
+                    <label for="welcomeEnabled">發送歡迎訊息</label>
+                </div>
+                <textarea id="welcomeMessage" placeholder="輸入歡迎訊息內容...">歡迎 {user} 加入伺服器！</textarea>
+            </div>
+
+            <div class="setting-group">
+                <label>自動身分組</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="autoRoleEnabled">
+                    <label for="autoRoleEnabled">新成員自動獲得身分組</label>
+                </div>
+                <input type="text" id="autoRoleName" placeholder="身分組名稱">
+            </div>
+
+            <div class="setting-group">
+                <label>活動狀態輪播</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="statusRotation" checked>
+                    <label for="statusRotation">啟用狀態輪播</label>
+                </div>
+                <div id="statusMessages">
+                    <input type="text" class="status-input" value="/ep 查詢 EP" placeholder="狀態訊息">
+                    <input type="text" class="status-input" value="/weather 查天氣" placeholder="狀態訊息">
+                </div>
+                <button class="btn-secondary" onclick="addStatusMessage()">➕ 新增狀態</button>
+            </div>
+        </div>
+
+        <!-- 日誌設定 -->
+        <div id="logging" class="tab-content">
+            <h2>📊 日誌設定</h2>
+            
+            <div class="setting-group">
+                <label>日誌頻道</label>
+                <input type="text" id="logChannel" placeholder="頻道 ID">
+            </div>
+
+            <div class="setting-group">
+                <label>記錄事件類型</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="logJoins" checked>
+                    <label for="logJoins">成員加入/離開</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="logMessages" checked>
+                    <label for="logMessages">訊息刪除/編輯</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="logModActions" checked>
+                    <label for="logModActions">管理操作</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="logErrors">
+                    <label for="logErrors">錯誤記錄</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 控制按鈕 -->
+        <div class="control-buttons">
+            <button class="btn-primary" onclick="saveSettings()">💾 儲存設定</button>
+            <button class="btn-secondary" onclick="loadSettings()">🔄 重新載入</button>
+            <button class="btn-danger" onclick="resetSettings()">🔄 恢復預設</button>
+        </div>
+
+        <div id="message" class="message"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
